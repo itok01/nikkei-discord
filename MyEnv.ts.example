@@ -1,0 +1,11 @@
+type Env = {
+    nikkeiSubscribeKeywords: string[];
+    discordWebhookUrl: string;
+};
+
+const MyEnv: Env = {
+    nikkeiSubscribeKeywords: ['朝刊1面を読もう'],
+    discordWebhookUrl: 'https://discord.com/api/webhooks/000/FOO'
+};
+
+export default MyEnv;
