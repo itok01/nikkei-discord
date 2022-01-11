@@ -2,28 +2,31 @@
 import * as Cheerio from 'cheerio';
 import MyEnv from './MyEnv';
 
-const NIKKEI_SEARCH_URL = 'https://www.nikkei.com/search?keyword=';
+const NIKKEI_SEARCH_URL = 'https://www.nikkei.com/search';
 
 const main = () => {
-    const now = new Date(Date.now());
+    const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = spreadsheet.getActiveSheet();
+
+    const oldArticleUrls: string[] = sheet.getRange('A1:A10').getValues().flat();
 
     MyEnv.nikkeiSubscribeKeywords.forEach((keyword) => {
         const targetUrl = nikkeiSearchUrl(keyword);
 
         const contents = UrlFetchApp.fetch(targetUrl).getContentText();
         const $ = Cheerio.load(contents);
-        const articles = $('div.nui-card__main');
-        articles.each((_, article) => {
+        const articleElements = $('div.nui-card__main');
+        let articlesUrls: string[] = [];
+        articleElements.each((_, article) => {
             const articleTitleElement = $('h3.nui-card__title > a', article).first();
-            const articleTimeElement = $('a.nui-card__meta-pubdate > time', article).first();
             const articleTitle = articleTitleElement.attr('title');
             const articleUrl = articleTitleElement.attr('href');
-            const articlePublishedAt = new Date(Date.parse(articleTimeElement.attr('datetime')));
 
-            if ((now.getTime() - 60) <= articlePublishedAt.getTime()) {
+            articlesUrls.push(articleUrl);
+
+            if (!oldArticleUrls.includes(articleUrl)) {
                 Logger.log(`Title: ${articleTitle}`);
                 Logger.log(`URL: ${articleUrl}`);
-                Logger.log(`Datetime: ${articlePublishedAt}`);
 
                 UrlFetchApp.fetch(MyEnv.discordWebhookUrl, {
                     method: 'post',
@@ -34,9 +37,11 @@ const main = () => {
                 });
             }
         });
+
+        sheet.getRange('A1:A10').setValues(articlesUrls.map((v) => [v]));
     });
 };
 
-const nikkeiSearchUrl = (keyword: string): string => {
-    return NIKKEI_SEARCH_URL + keyword;
+const nikkeiSearchUrl = (keyword: string, volume: number = 10): string => {
+    return `${NIKKEI_SEARCH_URL}?keyword=${keyword}&volume=${volume}`;
 };
