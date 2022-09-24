@@ -1,4 +1,9 @@
 {
+  "name": "nitok-schedule-discord",
+  "private": true,
+  "scripts": {
+    "dev": "clasp push --watch"
+  },
   "dependencies": {
     "@types/google-apps-script": "^1.0.42",
     "cheerio": "^1.0.0-rc.10"
