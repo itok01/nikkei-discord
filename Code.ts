@@ -39,15 +39,19 @@ const main = () => {
         });
 
         const newSheetValues: string[] = (new Array(NIKKEI_SEARCH_VOLUME)).fill('');
-        Array.from(newArticleUrlSet.values()).slice(0, NIKKEI_SEARCH_VOLUME).forEach((v, i) => {
-            newSheetValues[i] = v;
-        });
+        Array.from(newArticleUrlSet.values()).
+            slice(0, NIKKEI_SEARCH_VOLUME).
+            forEach((v, i) => {
+                newSheetValues[i] = v;
+            });
 
-        sheet.getRange(`A1:A${NIKKEI_SEARCH_VOLUME}`).setValues(newSheetValues.map((v) => [v]));
+        sheet.getRange(`A1:A${NIKKEI_SEARCH_VOLUME}`).
+            setValues(newSheetValues.map((v) => [v]));
 
         const textContent = Array.from(newArticleUrlSet.values()).
             filter(v => !oldArticleUrlSet.has(v)).
-            map(v => `${newArticleTitles[v]}\n${v}`).join('\n\n');
+            map(v => `${newArticleTitles[v]}\n${v}`).
+            join('\n\n');
 
         if (!textContent.trim()) return;
 
