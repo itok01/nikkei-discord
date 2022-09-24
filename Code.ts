@@ -22,7 +22,7 @@ const main = () => {
         const $ = Cheerio.load(contents);
         const articleElements = $('div.nui-card__main');
         articleElements.each((i, article) => {
-            if (i > MyEnv.nikkeiSearchVolume) return;
+            if (i >= MyEnv.nikkeiSearchVolume) return;
 
             const articleTitleElement = $('h3.nui-card__title > a', article).first();
             const articleTitle = articleTitleElement.attr('title');
