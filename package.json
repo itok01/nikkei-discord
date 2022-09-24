@@ -7,5 +7,8 @@
   "dependencies": {
     "@types/google-apps-script": "^1.0.42",
     "cheerio": "^1.0.0-rc.10"
+  },
+  "devDependencies": {
+    "@google/clasp": "^2.4.1"
   }
 }
