@@ -8,8 +8,13 @@ const main = () => {
     const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
     const sheet = spreadsheet.getActiveSheet();
 
-    const oldArticleUrls: string[] = sheet.getRange('A1:A10').getValues().flat();
+    const oldArticleUrls: Set<string> = new Set();
+    sheet.getRange('A1:A10').getValues().flat().forEach((v) => {
+        oldArticleUrls.add(v);
+    });
 
+    const newArticleUrls: Set<string> = new Set();
+    const newArticleTitles: Map<string, string> = new Map();
     MyEnv.nikkeiSubscribeKeywords.forEach((keyword) => {
         const targetUrl = nikkeiSearchUrl(keyword);
 
@@ -22,23 +27,32 @@ const main = () => {
             const articleTitle = articleTitleElement.attr('title');
             const articleUrl = articleTitleElement.attr('href');
 
-            articlesUrls.push(articleUrl);
+            if (!articleTitle) return;
+            if (!articleUrl) return;
 
-            if (!oldArticleUrls.includes(articleUrl)) {
-                Logger.log(`Title: ${articleTitle}`);
-                Logger.log(`URL: ${articleUrl}`);
+            newArticleTitles[articleUrl] = articleTitle;
 
-                UrlFetchApp.fetch(MyEnv.discordWebhookUrl, {
-                    method: 'post',
-                    contentType: 'application/json',
-                    payload: JSON.stringify({
-                        content: `${articleTitle}\n${articleUrl}`
-                    })
-                });
-            }
+            newArticleUrls.add(articleUrl);
         });
 
-        sheet.getRange('A1:A10').setValues(articlesUrls.map((v) => [v]));
+        sheet.getRange('A:A').setValues(articlesUrls.map((v) => [v]));
+
+        const textContent = [...newArticleUrls].
+            filter(v => !oldArticleUrls.has(v)).
+            map(v => `${newArticleTitles[v]}\n${v}`).concat('\n\n');
+
+        if (!textContent) return;
+
+        Logger.log('Will post this text');
+        Logger.log(textContent);
+
+        UrlFetchApp.fetch(MyEnv.discordWebhookUrl, {
+            method: 'post',
+            contentType: 'application/json',
+            payload: JSON.stringify({
+                content: textContent
+            })
+        });
     });
 };
 
