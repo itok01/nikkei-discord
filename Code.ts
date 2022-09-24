@@ -10,12 +10,11 @@ const main = () => {
     const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
     const sheet = spreadsheet.getActiveSheet();
 
-    const oldArticleUrls: Set<string> = new Set();
-    sheet.getRange('A1:A10').getValues().flat().forEach((v) => {
-        oldArticleUrls.add(v);
-    });
+    const oldArticleUrlSet: Set<string> = new Set(
+        sheet.getRange('A1:A10').getValues().flat()
+    );
 
-    const newArticleUrls: Set<string> = new Set();
+    const newArticleUrlSet: Set<string> = new Set();
     const newArticleTitles: Map<string, string> = new Map();
     MyEnv.nikkeiSubscribeKeywords.forEach((keyword) => {
         const targetUrl = nikkeiSearchUrl(keyword, NIKKEI_SEARCH_VOLUME);
@@ -36,18 +35,18 @@ const main = () => {
             const articleUrl = NIKKEI_ORIGIN + articlePath;
 
             newArticleTitles[articleUrl] = articleTitle;
-            newArticleUrls.add(articleUrl);
+            newArticleUrlSet.add(articleUrl);
         });
 
         const newSheetValues: string[] = (new Array(NIKKEI_SEARCH_VOLUME)).fill('');
-        Array.from(newArticleUrls.values()).slice(0, NIKKEI_SEARCH_VOLUME).forEach((v, i) => {
+        Array.from(newArticleUrlSet.values()).slice(0, NIKKEI_SEARCH_VOLUME).forEach((v, i) => {
             newSheetValues[i] = v;
         });
 
         sheet.getRange(`A1:A${NIKKEI_SEARCH_VOLUME}`).setValues(newSheetValues.map((v) => [v]));
 
-        const textContent = [...newArticleUrls].
-            filter(v => !oldArticleUrls.has(v)).
+        const textContent = Array.from(newArticleUrlSet.values()).
+            filter(v => !oldArticleUrlSet.has(v)).
             map(v => `${newArticleTitles[v]}\n${v}`).join('\n\n');
 
         if (!textContent.trim()) return;
