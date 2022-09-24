@@ -35,7 +35,7 @@ const main = () => {
             newArticleUrls.add(articleUrl);
         });
 
-        sheet.getRange('A:A').setValues(articlesUrls.map((v) => [v]));
+        sheet.getRange('A1:A10').setValues(articlesUrls.map((v) => [v]));
 
         const textContent = [...newArticleUrls].
             filter(v => !oldArticleUrls.has(v)).
