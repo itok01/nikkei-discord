@@ -10,7 +10,7 @@ const main = () => {
     const sheet = spreadsheet.getActiveSheet();
 
     const oldArticleUrlSet: Set<string> = new Set(
-        sheet.getRange(`A1:${MyEnv.nikkeiSearchVolume}`).getValues().flat()
+        sheet.getRange(`A1:A${MyEnv.nikkeiSearchVolume}`).getValues().flat()
     );
 
     const newArticleUrlSet: Set<string> = new Set();
