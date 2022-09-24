@@ -28,10 +28,12 @@ const main = () => {
 
             const articleTitleElement = $('h3.nui-card__title > a', article).first();
             const articleTitle = articleTitleElement.attr('title');
-            const articleUrl = articleTitleElement.attr('href');
+            const articlePath = articleTitleElement.attr('href');
 
             if (!articleTitle) return;
-            if (!articleUrl) return;
+            if (!articlePath) return;
+
+            const articleUrl = NIKKEI_ORIGIN + articlePath;
 
             newArticleTitles[articleUrl] = articleTitle;
             newArticleUrls.add(articleUrl);
